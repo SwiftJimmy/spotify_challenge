@@ -21,7 +21,7 @@ def create_spotify_db(conn : sqlite3.Connection ):
     
         conn.execute("""CREATE TABLE IF NOT EXISTS release(
                         release_msid VARCHAR(36) PRIMARY KEY,
-                        release_name VARCHAR NOT NULL ON CONFLICT IGNORE,
+                        release_name VARCHAR,
                         total_discs INT(3),
                         total_tracks INT(3),
                         release_date DATE );""") 
@@ -33,8 +33,8 @@ def create_spotify_db(conn : sqlite3.Connection ):
                         disc_number INT(3),
                         track_duration_ms INT(9));""") 
     
-        conn.execute("""CREATE TABLE IF NOT EXISTS listened_fact(
-                        listened_id VARCHAR(32) PRIMARY KEY,
+        conn.execute("""CREATE TABLE IF NOT EXISTS stream(
+                        stream_id VARCHAR(32) PRIMARY KEY,
                         track_msid VARCHAR(32) NOT NULL,
                         artist_msid VARCHAR(36) NOT NULL,
                         release_msid VARCHAR(36) NOT NULL,

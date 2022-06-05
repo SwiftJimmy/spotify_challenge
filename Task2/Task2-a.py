@@ -24,11 +24,11 @@ def query_total_entries_per_table(conn:sqlite3.Connection) -> pd.DataFrame:
     return pd.read_sql_query("""
             SELECT  (  
                         SELECT COUNT( DISTINCT user_name) 
-                        FROM listened_fact
+                        FROM stream
                     ) AS user_count, 
                     (   
                         SELECT COUNT(1) 
-                        FROM listened_fact
+                        FROM stream
                     ) AS stream_count, 
                     (   
                         SELECT COUNT(1) 
@@ -81,7 +81,7 @@ def query_active_users_over_weeks_and_weekdays_by_year(conn:sqlite3.Connection, 
     """
     return pd.read_sql_query(f"""  
             SELECT   COUNT( DISTINCT lf.user_name) AS active_user, week, weekday, day_of_week, year
-            FROM     listened_fact lf 
+            FROM     stream lf 
                         INNER JOIN time t on lf.timestamp_unix_id == t.timestamp_unix_id
             WHERE year = '{year}'
             GROUP BY year, week, day_of_week""", conn)
@@ -95,7 +95,7 @@ def query_streams_over_weekdays(conn:sqlite3.Connection) -> pd.DataFrame:
     """
     stream_count_weekday_by_week = pd.read_sql_query(f"""  
             SELECT year, week, weekday, COUNT(1) AS streams
-            FROM listened_fact lf 
+            FROM stream lf 
                     INNER JOIN time t ON lf.timestamp_unix_id == t.timestamp_unix_id
             GROUP BY year, week, weekday""", conn)
 
@@ -130,7 +130,7 @@ def weekly_trend_track(conn:sqlite3.Connection, top_n:str = "5") -> pd.DataFrame
 	        SELECT   year, week, track_name, artist_name, lf.track_msid,
                      DENSE_RANK() OVER(PARTITION by year, week ORDER BY COUNT(lf.track_msid) DESC) as weekly_track_rank,
                      COUNT(lf.track_msid) AS weekly_track
-            FROM    listened_fact lf    INNER JOIN track tr ON lf.track_msid == tr.track_msid
+            FROM    stream lf    INNER JOIN track tr ON lf.track_msid == tr.track_msid
                                         INNER JOIN time t   ON lf.timestamp_unix_id == t.timestamp_unix_id
                                         INNER JOIN artist a   ON lf.artist_msid == a.artist_msid
             GROUP BY  lf.track_msid, year, week
@@ -164,7 +164,7 @@ def weekly_trend_artist(conn:sqlite3.Connection, top_n:str = "5") -> pd.DataFram
 	        SELECT   year, week, artist_name, lf.artist_msid,
                      DENSE_RANK() OVER(PARTITION by year, week ORDER BY COUNT(lf.artist_msid) DESC) as weekly_artist_rank,
                      COUNT(lf.artist_msid) AS weekly_artist
-            FROM     listened_fact lf INNER JOIN artist a ON lf.artist_msid == a.artist_msid 
+            FROM     stream lf INNER JOIN artist a ON lf.artist_msid == a.artist_msid 
                                 INNER JOIN time t   ON lf.timestamp_unix_id == t.timestamp_unix_id
 
             GROUP BY lf.artist_msid, year, week
@@ -197,7 +197,7 @@ def weekly_trend_release(conn:sqlite3.Connection, top_n:str = "5") -> pd.DataFra
 	        SELECT   year, week, release_name, artist_name, lf.release_msid,
                      DENSE_RANK() OVER(PARTITION by year, week ORDER BY COUNT(lf.release_msid) DESC) as weekly_release_rank,
                      COUNT(lf.release_msid) AS weekly_release
-            FROM     listened_fact lf    INNER JOIN release r ON lf.release_msid == r.release_msid
+            FROM     stream lf    INNER JOIN release r ON lf.release_msid == r.release_msid
                                             INNER JOIN time t   ON lf.timestamp_unix_id == t.timestamp_unix_id
                                             INNER JOIN artist a   ON lf.artist_msid == a.artist_msid
             WHERE    lf.release_msid != "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
@@ -344,29 +344,29 @@ def get_table_statistics(conn:sqlite3.Connection, table_name:str, columns:set) -
 
 def combine_table_statistics(conn:sqlite3.Connection) -> pd.DataFrame:
     """
-    Combines statistic table data from track, release, time and listened_fact into one df.
+    Combines statistic table data from track, release, time and stream into one df.
     Parameters:
         conn (sqlite3.Connection): Databse connection.
     Returns:
-        result (pd.DataFrame): Combination of track, release, time and listened_fact statistic df's.
+        result (pd.DataFrame): Combination of track, release, time and stream statistic df's.
     """
     #Track table
     track_columns = ['track_number','disc_number', 'track_duration_ms' ]
     track_statistics = get_table_statistics(conn,table_name='track',columns=track_columns)
 
     #Release table
-    release_columns =['total_discs','total_tracks','release_date' ]
+    release_columns =['total_discs','total_tracks','release_date', 'release_name' ]
     release_statistics = get_table_statistics(conn,table_name='release',columns=release_columns)
 
     #time table
     time_columns =['day_of_week', 'day', 'week', 'month' , 'year']
     time_statistics = get_table_statistics(conn,table_name='time',columns=time_columns)
 
-    #listened_fact table
-    listened_fact_columns =['dedup_tag' ]
-    listened_fact_statistics = get_table_statistics(conn,table_name='listened_fact',columns=listened_fact_columns)
+    #stream table
+    stream_columns =['dedup_tag' ]
+    stream_statistics = get_table_statistics(conn,table_name='stream',columns=stream_columns)
     
-    return pd.concat([track_statistics, release_statistics, time_statistics, listened_fact_statistics])
+    return pd.concat([track_statistics, release_statistics, time_statistics, stream_statistics])
 
 
 

@@ -22,7 +22,7 @@ def query_most_active_user(conn:sqlite3.Connection, top_n: str = 10) -> pd.DataF
     """
     active_user_ranking = pd.read_sql_query("""
             SELECT      user_name, DENSE_RANK() OVER(ORDER BY COUNT(1) DESC) as rank
-            FROM        listened_fact
+            FROM        stream
             GROUP BY    user_name;""", conn)
     
     return sqldf(f"""
@@ -42,7 +42,7 @@ def query_number_of_active_users_by_date(conn:sqlite3.Connection, date: str) -> 
     """
     return pd.read_sql_query(f"""
             SELECT  COUNT( DISTINCT user_name) as active_users
-            FROM    listened_fact lf 
+            FROM    stream lf 
                         INNER JOIN time t ON lf.timestamp_unix_id == t.timestamp_unix_id
             WHERE   date == '{date}';""", conn)
     
@@ -58,7 +58,7 @@ def query_first_songs_users_listened_to(conn:sqlite3.Connection) -> pd.DataFrame
     """
     return pd.read_sql_query("""
             SELECT DISTINCT user_name, track_name, MIN(timestamp_utc) AS listend_at
-            FROM   listened_fact lf 
+            FROM   stream lf 
                         INNER JOIN track tr ON lf.track_msid = tr.track_msid
                         INNER JOIN time t ON lf.timestamp_unix_id = t.timestamp_unix_id
             GROUP BY user_name

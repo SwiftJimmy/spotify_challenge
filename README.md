@@ -1,7 +1,7 @@
-# spotify_challenge
+# spotify challenge
 
 ## Overview
-The following describes the 5 main folders of the repository:
+The following describes the 5 main folders of the repository and there usage:
 
 1. The content of folder **data** represents the data life cycle during the etl job. 
 As soon as the pipeline has been started, all new files, stored in the **ingest** subfolder getting processed. If an error occurs during the data processing, they will be moved to the **invalid** folder. The corrupted data can be either the entire file or just individual records. The data moves to the **loaded** folder, once they have been successfully processed and loaded into the database.

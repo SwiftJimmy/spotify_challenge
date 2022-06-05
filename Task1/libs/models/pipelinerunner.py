@@ -1,16 +1,14 @@
 import os
 import shutil
-import sys
 import sqlite3
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
-
-from etl import etl
-from db import db_setup
+from libs.etl import etl
+from libs.db import db_setup
 
 
 class PipelineRunner():
+    """
+    PipelineRunner orchestrates the data livecycle.
+    """
     db_path: str
     invalide_data_path: str
     loaded_data_path:str
@@ -22,12 +20,20 @@ class PipelineRunner():
 
 
     def create_database(self):
+        """
+        Creates the database.
+        """
         conn= sqlite3.connect(self.db_path, check_same_thread=False)
         db_setup.create_spotify_db(conn)
         conn.close()
 
 
     def run_spotify_pipeline(self, src_path:str):
+        """
+        Runs the data etl pipeline.
+        Parameters:
+            src_path (str): File source path
+        """
         print('Start extraction.')
         try:
             df = etl.extract(src_path)
@@ -64,11 +70,22 @@ class PipelineRunner():
         
 
     def copy_invalide_file(self, src_path:str):
+        """
+        Copies a file to the invalide folder. 
+        Parameters:
+            src_path (str): File source path
+        """
         target = f"{self.invalide_data_path}/{ os.path.basename(src_path)}"
         shutil.copyfile(src_path, target)
         print(f'Transfared {src_path} to {target}')
 
+
     def copy_loaded_file(self, src_path:str):
+        """
+        Copies a file to the loaded folder. 
+        Parameters:
+            src_path (str): File source path
+        """
         target = f"{self.loaded_data_path}/{ os.path.basename(src_path)}"
         shutil.copyfile(src_path, target)
         print(f'Transfared {src_path} to {target}')

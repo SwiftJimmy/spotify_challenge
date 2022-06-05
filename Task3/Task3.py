@@ -28,7 +28,7 @@ def query_weekly_trend_of_streams_and_user(conn:sqlite3.Connection) -> pd.DataFr
                       LAG(COUNT(DISTINCT user_name)) OVER ( ORDER BY year, week) AS active_user_previous_week,
                       COUNT(1) AS weekly_streams,
                       LAG(COUNT(1)) OVER ( ORDER BY year, week) AS streams_previous_week
-            FROM      listened_fact lf INNER JOIN time t ON lf.timestamp_unix_id == t.timestamp_unix_id
+            FROM      stream lf INNER JOIN time t ON lf.timestamp_unix_id == t.timestamp_unix_id
             GROUP BY  year, week""", conn)
 
     return sqldf("""

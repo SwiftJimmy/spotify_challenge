@@ -1,13 +1,7 @@
-import os
-import sys
 import sqlite3
 import pandas as pd
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
-
-from etl import helper
-from schemas.stream import stream_schema
+from libs.etl import helper
+from libs.schemas.stream import stream_schema
 
 def extract(path:str) -> pd.DataFrame:
     """
@@ -62,16 +56,24 @@ def transform(df: pd.DataFrame) -> pd.DataFrame:
     keys_to_hash: set = ["track_name", "artist_msid"]
     df['track_msid'] =  helper.make_hash_column(df,keys_to_hash)
 
-    # Set unknown release
-    df.loc[df[['release_msid', 'release_name']].isna().all(axis=1), 'release_name'] = "Unknown"
-    df['release_msid'] = df["release_msid"].fillna("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+    # Fill Null release_msid with release_msid from other rows, based on the same track_msid (Artist Song combination)
+    df['release_msid'] = df.groupby(['track_msid'], sort=False)['release_msid'].apply(lambda x: x.ffill().bfill())
 
+    # Fill Null release_name with release_name from other rows, based on the same release_msid
+    df['release_name'] = df.groupby(['release_msid'], sort=False)['release_name'].apply(lambda x: x.ffill().bfill())
+    
+    # Set unknown release name where 'release_msid' and 'release_name' is unknown
+    df.loc[df[['release_msid', 'release_name']].isna().all(axis=1), 'release_name'] = "Unknown"
+
+    # Set unknown release_msid where release_msid is null
+    df['release_msid'] = df["release_msid"].fillna("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+  
      # Get Year from release
     df['release_date'] = df["date"].str[-4:]    
 
-    # Create hash for listened_id
+    # Create hash for stream_id
     keys_to_hash: set = ["track_msid", "listened_at", "user_name","dedup_tag"]
-    df['listened_id'] =  helper.make_hash_column(df,keys_to_hash)
+    df['stream_id'] =  helper.make_hash_column(df,keys_to_hash)
 
     # Create time table data
     df['timestamp_utc']= pd.to_datetime(df['listened_at'], unit='s', utc=True)
@@ -126,10 +128,10 @@ def load(df: pd.DataFrame, db_conn:sqlite3.Connection):
     c.executemany(sql,records)
     db_conn.commit()
 
-    # Load into listened_fact
-    sql = """INSERT INTO listened_fact (listened_id, track_msid, artist_msid, release_msid, timestamp_unix_id, user_name, dedup_tag) VALUES(?,?,?,?,?,?,?) 
-             ON CONFLICT(listened_id) DO NOTHING """
-    records = df[["listened_id","track_msid","artist_msid", "release_msid", "listened_at", "user_name", "dedup_tag"]].values.tolist()
+    # Load into stream
+    sql = """INSERT INTO stream (stream_id, track_msid, artist_msid, release_msid, timestamp_unix_id, user_name, dedup_tag) VALUES(?,?,?,?,?,?,?) 
+             ON CONFLICT(stream_id) DO NOTHING """
+    records = df[["stream_id","track_msid","artist_msid", "release_msid", "listened_at", "user_name", "dedup_tag"]].values.tolist()
     c.executemany(sql,records)
     db_conn.commit()
     c.close()

@@ -16,7 +16,7 @@ pysqldf = lambda q: sqldf(q, locals())
 def query_distribution_of_streams_per_weekday_by_user(conn:sqlite3.Connection) -> pd.DataFrame:
         grouped_weekday_count = pd.read_sql_query("""
                 SELECT   COUNT(1) AS streams, weekday, user_name
-                FROM     listened_fact lf INNER JOIN time t 
+                FROM     stream lf INNER JOIN time t 
                                ON lf.timestamp_unix_id == t.timestamp_unix_id
                 GROUP BY weekday, user_name""",conn)
 
@@ -40,7 +40,7 @@ def query_distribution_of_stream_time_category_by_user(conn:sqlite3.Connection) 
                       WHEN time between '17:00:00' and  '20:59:59' THEN 'evening_listener'
                       WHEN time >= '21:00:00' OR time < '01:00:00'THEN 'early_night_listener'
                     END AS time_category 
-                FROM listened_fact lf 
+                FROM stream lf 
                         INNER JOIN time t ON lf.timestamp_unix_id == t.timestamp_unix_id;""",conn)
 
         grouped_time_categorization = sqldf("""
@@ -62,7 +62,7 @@ def query_distribution_of_stream_time_category_by_user(conn:sqlite3.Connection) 
 def query_variation_coefficient_of_dimension_by_user_on_weekly_basis(conn:sqlite3.Connection, dimension:str) -> pd.DataFrame:
         total_unique_entries_per_user_by_week = pd.read_sql_query(f"""
                 SELECT   year, user_name, week,  COUNT( DISTINCT {dimension}_msid) AS unique_entries
-                FROM     listened_fact lf 
+                FROM     stream lf 
                                 INNER JOIN time t ON lf.timestamp_unix_id == t.timestamp_unix_id
                 GROUP BY user_name, year, week;""",conn)
 

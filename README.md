@@ -13,3 +13,8 @@ As soon as the pipeline has been started, all new files, stored in the **ingest*
 4. In folder **Task2** you will find all the solutions for the three tasks from the assignment Task2. You will also find a corresponding README file for each task, which describes the solutions in more detail.
 
 5. In folder **Task3** you will find all the solutions for the assignment Task3.
+
+
+## Database Schema
+
+![Logo](https://github.com/SwiftJimmy/spotify_challenge/database/db_schema.jpg)

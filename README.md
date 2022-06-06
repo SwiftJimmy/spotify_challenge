@@ -13,7 +13,7 @@ As soon as the pipeline has been started, all new files, stored in the **ingest*
 5. In folder **Task3** you will find all the solutions for the assignment Task3.
 
 
-## Database Schema
-
+### Database Schema
+Here is an overview of the database schema! 
 
 ![Logo](https://github.com/SwiftJimmy/spotify_challenge/blob/main/database/db_schema.jpg)

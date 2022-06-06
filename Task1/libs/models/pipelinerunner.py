@@ -82,10 +82,11 @@ class PipelineRunner():
 
     def copy_loaded_file(self, src_path:str):
         """
-        Copies a file to the loaded folder. 
+        Copies a file to the loaded folder and deletes the source. 
         Parameters:
             src_path (str): File source path
         """
         target = f"{self.loaded_data_path}/{ os.path.basename(src_path)}"
         shutil.copyfile(src_path, target)
+        os.remove(src_path)
         print(f'Transfared {src_path} to {target}')

@@ -1,5 +1,3 @@
-# spotify challenge
-
 ## Overview
 The following describes the 5 main folders of the repository and there usage:
 
@@ -17,4 +15,5 @@ As soon as the pipeline has been started, all new files, stored in the **ingest*
 
 ## Database Schema
 
-![Logo](https://github.com/SwiftJimmy/spotify_challenge/database/db_schema.jpg)
+
+![Logo](https://github.com/SwiftJimmy/spotify_challenge/blob/main/database/db_schema.jpg)

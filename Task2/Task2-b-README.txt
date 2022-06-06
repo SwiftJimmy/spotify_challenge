@@ -18,7 +18,7 @@ The features are:
     Based on the user, I calculated the number of streams per weekday, divided by the total number of streams.
     This may also determine when advertising is sent to a user or at what day new releases/songs should be released.
 
-3.  Variation coefficient over distinc listened artists, releases and tracks on weekly basis:
+3.  Variation coefficient over distinct listened artists, releases and tracks on weekly basis:
     'variation_coefficient_over_listened_artists_on_weekly_basis',
     'variation_coefficient_over_listened_releases_on_weekly_basis',
     'variation_coefficient_over_listened_tracks_on_weekly_basis'
@@ -28,6 +28,4 @@ The features are:
     Low values tend to describe users who don't change their behavior much and mostly listen 
     the same artists, albums or songs. High values express a frequent change of artists, albums or songs.
 
-    This may makes it possible to identify customers to whom new music can be introduced.
-
-See and run Task2-b.py
+    This may make it possible to identify customers to whom new music can be introduced to.

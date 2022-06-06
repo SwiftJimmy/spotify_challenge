@@ -1,20 +1,25 @@
 from datetime import datetime
 from watchdog.events import FileSystemEventHandler
+from libs.models.spotify_pipelinerunner import SpotifyPipelineRunner
 from libs.models.pipelinerunner import PipelineRunner
 
 class PipelineHandler(FileSystemEventHandler):
     """
     PipelineHandler used to observe the ingestion folder for incomming files.
     """
-    pipeline_runner:PipelineRunner
+    pipeline_runner:SpotifyPipelineRunner
 
 
     def __init__(self, pipeline_runner:PipelineRunner):
         print('PipelineHandler is running.')
         print('Waiting for new files to arrive in data/ingest')
-
-        self.pipeline_runner = pipeline_runner
-        self.pipeline_runner.create_database()
+        try:
+            self.pipeline_runner = pipeline_runner
+            self.pipeline_runner.create_database()
+        except Exception as e:
+            print(e)
+            print(f"Database creation faild")
+        
         
 
     def on_created(self, event):

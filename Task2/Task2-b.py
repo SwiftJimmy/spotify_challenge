@@ -117,6 +117,7 @@ def main():
         clustering_df = clustering_df.reset_index(level=0)
         conn.close()
         print(clustering_df)
+        print(clustering_df.info())
         
 
 if __name__ == '__main__':

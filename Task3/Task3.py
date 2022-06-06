@@ -89,7 +89,7 @@ def plot_bar_chart(df:pd.DataFrame, ax:plt.axes, subject:str, column:str ):
     df = df[['year','week', column]] 
     df = df.pivot(index="week",columns="year", values=column)
 
-    df.plot(kind='bar',width=0.8,rot=1, title=f"Number of weekly {subject}", ax=ax)
+    df.plot(kind='bar',width=0.8,rot=1, title=f"Number of Weekly {subject}", ax=ax)
     
     for bar in ax.patches:
         ax.annotate(format(bar.get_height(), '.0f'),
@@ -152,8 +152,8 @@ def main():
         print("\n\n2. Bar and table plot with the number of weekly avg user streams and the percent changes compared to prev. week")
         print("See Figure2")
         fig, axes = plt.subplots(2, 1, figsize=(10,12))
-        plot_bar_chart(df=df, subject="Average User Streams", column="weekly_avg_streams_user", ax=axes[0])
-        plot_trend_table(df=df, subject="Average User Streams", column="avg_streams_user", ax=axes[1])
+        plot_bar_chart(df=df, subject="Average Streams per User", column="weekly_avg_streams_user", ax=axes[0])
+        plot_trend_table(df=df, subject="Average Streams per User", column="avg_streams_user", ax=axes[1])
         
         print("\n\n3. Line plot with the total number of weekly streams.")
         print("See Figure3")

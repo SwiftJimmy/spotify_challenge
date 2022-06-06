@@ -24,8 +24,8 @@ class PipelineHandler(FileSystemEventHandler):
             event (): Incomming event
         """
         print(f"{datetime.now()} - New file in pipeline: {event.src_path}")
-
-        if (event.src_path.lower().endswith(('.json', '.txt'))):
-            self.pipeline_runner.run_spotify_pipeline(src_path=event.src_path)
-        else:
-            self.pipeline_runner.copy_invalide_file(src_path=event.src_path)
+        try:             
+            self.pipeline_runner.run_pipeline(src_path=event.src_path)   
+        except Exception as e:
+            print(e)
+            self.pipeline_runner.on_error(src_path=event.src_path)

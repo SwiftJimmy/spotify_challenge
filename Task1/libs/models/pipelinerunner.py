@@ -42,7 +42,6 @@ class PipelineRunner():
             print('Extraction faied')
         print('Finished extraction.')
         print('Start validation.')
-        df = etl.validate_data(df, invalid_data_path=self.invalide_data_path)
         try:
             df = etl.validate_data(df, invalid_data_path=self.invalide_data_path)
         except Exception as e:

@@ -71,12 +71,13 @@ class PipelineRunner():
 
     def copy_invalide_file(self, src_path:str):
         """
-        Copies a file to the invalide folder. 
+        Copies a file to the invalide folder and deletes the source. 
         Parameters:
             src_path (str): File source path
         """
         target = f"{self.invalide_data_path}/{ os.path.basename(src_path)}"
         shutil.copyfile(src_path, target)
+        os.remove(src_path)
         print(f'Transfared {src_path} to {target}')
 
 
